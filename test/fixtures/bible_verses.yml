@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  language: 
+  version: 
+  book: 
+  chapter: 1
+  verse: 1
+
+two:
+  language: 
+  version: 
+  book: 
+  chapter: 1
+  verse: 1

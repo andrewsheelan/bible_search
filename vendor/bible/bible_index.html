@@ -1,0 +1,88 @@
+<!doctype html>
+ 
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Bible Verses</title>
+    <link rel="stylesheet" href="lib/jquery-ui.css" />
+    <script src="lib/jquery-1.8.2.js"></script>
+    <script src="lib/jquery-ui.js"></script>
+    <link rel="stylesheet" href="css/style.css" />
+    <script>
+      books = null
+      $(function() {
+        $.getJSON("json/books.json").done(function(response) {
+          books = response
+          $( "#tags" ).autocomplete({
+            source: books
+          });
+        });
+        $('#tags').keyup(function(e) { 
+          elem = e.srcElement
+          var regExp = /^([A-z]+)\s(\d*)[:]?(\S*)/
+          var regExpArr = regExp.exec(elem.value)
+          if(regExpArr) {
+            var re = new RegExp(elem.value.split(/\s/)[0], "i");
+            var chosenBook = $.grep(books, function (a) {return re.test(a);})[0];
+            var chosenChapter = regExpArr[2];
+            var chosenVerses = fetchVerseArray(regExpArr[3]);
+
+            console.log("Chosen Book = " + chosenBook);
+            console.log("Chosen verses")
+            console.log(chosenVerses)
+
+            if(chosenBook) {
+              $("#content").html("");
+              $.getJSON("json/"+chosenBook+"_ta_tav.json").done(function(book) {
+                console.log(book)
+
+                $.each(book,function(i, chapters) {
+                  if(!chosenChapter || chosenChapter==i) {
+                    $("#content").append("<br />CHAPTER " + (i) + "<br />");
+                    $.each(chapters, function(j, verses){
+                      if(!chosenVerses || $.inArray(verses.verse, chosenVerses)!=-1) {
+                        $("#content").append(verses.verse_text + "<br />");
+                      }
+                    });
+                  }
+                });
+
+              });
+            }
+          }
+        });
+      });
+
+      fetchVerseArray = function(verses) {
+        versesArr = null;
+        if(/,/.test(verses)){
+          versesArr = new Array();
+          $.each(verses.split(/,/), function(i,x){
+            versesArr.push(parseInt(x))
+          });
+        } 
+        else if (/(\d+)-*(\d*)/.test(verses)){
+          versesArrTemp = /(\d+)-*(\d*)/.exec(verses);
+          versesArr = [parseInt(versesArrTemp[1])];
+          vStart = versesArrTemp[1];
+          vEnd = versesArrTemp[2]?versesArrTemp[2]:versesArrTemp[1];
+          for(var index=(parseInt(vStart)+1); index <= vEnd; index++) {
+            versesArr.push(index);
+          }
+        }
+        return versesArr;
+      }
+
+</script>
+</head>
+<body>
+ 
+    <div class="ui-widget">
+      <label for="tags">Tags: </label>
+      <input id="tags" />
+      <div id="content">&nbsp;</div>
+    </div>
+ 
+ 
+</body>
+</html>
