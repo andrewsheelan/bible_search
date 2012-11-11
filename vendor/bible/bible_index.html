@@ -17,41 +17,44 @@
             source: books
           });
         });
+
         $('#tags').keyup(function(e) { 
           elem = e.srcElement
           var regExp = /^([A-z]+)\s(\d*)[:]?(\S*)/
           var regExpArr = regExp.exec(elem.value)
           if(regExpArr) {
             var re = new RegExp(elem.value.split(/\s/)[0], "i");
-            var chosenBook = $.grep(books, function (a) {return re.test(a);})[0];
-            var chosenChapter = regExpArr[2];
-            var chosenVerses = fetchVerseArray(regExpArr[3]);
-
-            console.log("Chosen Book = " + chosenBook);
-            console.log("Chosen verses")
-            console.log(chosenVerses)
+            chosenBook = $.grep(books, function (a) {return re.test(a);})[0];
+            chosenChapter = regExpArr[2];
+            chosenVerses = fetchVerseArray(regExpArr[3]);
 
             if(chosenBook) {
-              $("#content").html("");
-              $.getJSON("json/"+chosenBook+"_ta_tav.json").done(function(book) {
-                console.log(book)
+              $("#content").html("<table></table>");
+              columns = 0
+              $.when( 
+                $.getJSON("json/"+chosenBook+"_en_nkjv.json"),
+                $.getJSON("json/"+chosenBook+"_ta_tav.json")
+              ).done(printChapters);
 
-                $.each(book,function(i, chapters) {
-                  if(!chosenChapter || chosenChapter==i) {
-                    $("#content").append("<br />CHAPTER " + (i) + "<br />");
-                    $.each(chapters, function(j, verses){
-                      if(!chosenVerses || $.inArray(verses.verse, chosenVerses)!=-1) {
-                        $("#content").append(verses.verse_text + "<br />");
-                      }
-                    });
-                  }
-                });
-
-              });
             }
           }
+          
         });
       });
+
+      printChapters = function(english, tamil) {
+        $.each(english[0],function(i, chapters) {
+          tamilChapters = tamil[0][i]
+          if(!chosenChapter || chosenChapter==i) {
+            $("#content table").append("<tr><th colspan=2><br />CHAPTER " + (i) + "<br /></th></tr>");
+            $.each(chapters, function(j, verses){
+              if(!chosenVerses || $.inArray(verses.verse, chosenVerses)!=-1) {
+                $("#content table").append("<tr><td><br /> " + verses.verse_text + "<br /></td><td>"+tamilChapters[j].verse_text+"</td></tr>");
+              }
+            });
+          }
+        });
+      }
 
       fetchVerseArray = function(verses) {
         versesArr = null;
