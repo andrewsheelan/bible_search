@@ -19,7 +19,7 @@
         });
 
         $('#tags').keyup(function(e) { 
-          elem = e.srcElement
+          elem = (typeof e.target != 'undefined')?e.target:e.srcElement;
           var regExp = /^([A-z]+)\s(\d*)[:]?(\S*)/
           var regExpArr = regExp.exec(elem.value)
           if(regExpArr) {
