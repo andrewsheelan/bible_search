@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Bible Verses</title>
+  <meta http-equiv="Access-Control-Allow-Origin" content="*">  <title>Bible Verses</title>
     <link rel="stylesheet" href="lib/jquery-ui.css" />
     <script src="lib/jquery-1.8.2.js"></script>
     <script src="lib/jquery-ui.js"></script>
@@ -19,12 +19,15 @@
         });
 
         $('#tags').keyup(function(e) { 
-          elem = (typeof e.target != 'undefined')?e.target:e.srcElement;
-          var regExp = /^([A-z]+)\s(\d*)[:]?(\S*)/
+          elem = e.target || e.srcElement;
+          var regExp = /^([1]|[2]|[A-z]+)\s(\d*)[:]?(\S*)/
           var regExpArr = regExp.exec(elem.value)
           if(regExpArr) {
-            var re = new RegExp(elem.value.split(/\s/)[0], "i");
+		console.log(elem.value)
+		 var splitVar = elem.value.split(/\s/);
+            var re = new RegExp(((/\d/.test(splitVar[0]) && (splitVar.length > 1)) ? (splitVar[0] + " " + splitVar[1]) : splitVar[0]), "i");
             chosenBook = $.grep(books, function (a) {return re.test(a);})[0];
+		console.log(chosenBook)
             chosenChapter = regExpArr[2];
             chosenVerses = fetchVerseArray(regExpArr[3]);
 
