@@ -3,16 +3,19 @@ source 'https://rubygems.org'
 gem 'activeadmin'
 gem 'meta_search',    '>= 1.1.0.pre'
 
-gem 'pry'
-gem 'pry-nav'
+group :development do
+  gem 'pry'
+  gem 'pry-nav'
+  gem 'sqlite3'
+end
 
+gem 'mechanize'
 gem 'nokogiri'
 gem 'rails', '3.2.8'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-gem 'sqlite3'
 
 
 # Gems used only for assets and not required
