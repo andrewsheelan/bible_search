@@ -6,8 +6,6 @@ form.password='welcome123'
 page = form.submit form.buttons.first
 
 doc = page.parser
-doc.css('.zef_bible_Chapter .zef_verse_number').count
-doc.css('.zef_bible_Chapter .zef_verse').count
 
 
 language = Language.find_by_ref('SN')
@@ -15,8 +13,17 @@ version = Version.find_by_short_name('SNV')
 
 page_books = doc.css('#book option')
 page_books.each_with_index do |page_book, book_index|
+  form = agent.page.forms[2]
+  form.b = page_book.attr('value')
+  page = form.submit
+  doc = page.parser
+
   page_chapters = doc.css('#chapter option')
   page_chapters.each_with_index do |page_chapter, chapter_index|
+    form = agent.page.forms[2]
+    form.c=page_chapter.attr('value')
+    page = form.submit
+    doc = page.parser
     page_verses = doc.css('.zef_bible_Chapter .zef_verse')
     page_verse_numbers = doc.css('.zef_bible_Chapter .zef_verse_number')
     page_verses.each_with_index do |page_verse, verse_index|
@@ -30,7 +37,6 @@ page_books.each_with_index do |page_book, book_index|
                         misc_data: p_verse,
                         verse_text: "#{p_number}. #{p_verse}"
                        )
-      
     end
   end
 end
