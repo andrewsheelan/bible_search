@@ -1,13 +1,36 @@
-require 'open-uri'
-sn_snv_bible_index = Nokogiri::HTML(open("http://gospelgo.com/a/sinhala/Sinhala%20Bible%20-%20Unicode.htm"))
-books_data = sn_snv_bible_index.css('.bevelmenu li a')
+agent = Mechanize.new
+page = agent.get("http://www.sinhalaholybible.com/en/read-bible-sinhala-holy-bible/read-bible-sinhala-tamil-english.html")
+form = agent.page.forms.first
+form.username='andrewsheelan'
+form.password='welcome123'
+page = form.submit form.buttons.first
 
-# Code to create the books in the bible
-books_data.each_with_index do |book_data, index|
-  book_name = /([A-z 0-9]*)$/.match(book_data.attr('href'))[1] 
-  unless /Testament/.match(book_name)
-    book = Book.find_by_name(book_name)
-    puts book_name
-    SinhalaBook.create(name: book_data.text, book_id: book.id)
+doc = page.parser
+doc.css('.zef_bible_Chapter .zef_verse_number').count
+doc.css('.zef_bible_Chapter .zef_verse').count
+
+
+language = Language.find_by_ref('SN')
+version = Version.find_by_short_name('SNV')
+
+page_books = doc.css('#book option')
+page_books.each_with_index do |page_book, book_index|
+  page_chapters = doc.css('#chapter option')
+  page_chapters.each_with_index do |page_chapter, chapter_index|
+    page_verses = doc.css('.zef_bible_Chapter .zef_verse')
+    page_verse_numbers = doc.css('.zef_bible_Chapter .zef_verse_number')
+    page_verses.each_with_index do |page_verse, verse_index|
+      p_verse = page_verse.text.strip
+      p_number = page_verse_numbers[verse_number].text.strip
+      BibleVerse.create(language: language.id, 
+                        version: version, 
+                        book: Book.find(book_index), 
+                        chapter: page_chapter.text.strip,
+                        verse: p_number,
+                        misc_data: p_verse,
+                        verse_text: "#{p_number}. #{p_verse}"
+                       )
+      
+    end
   end
 end
