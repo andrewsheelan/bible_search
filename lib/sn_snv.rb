@@ -7,7 +7,7 @@ page = form.submit form.buttons.first
 
 doc = page.parser
 
-
+puts "Successfully Parsed!"
 language = Language.find_by_ref('SN')
 version = Version.find_by_short_name('SNV')
 
@@ -17,6 +17,7 @@ page_books.each_with_index do |page_book, book_index|
   form.b = page_book.attr('value')
   page = form.submit
   doc = page.parser
+  puts "Parsed.." + page_book.text
 
   page_chapters = doc.css('#chapter option')
   page_chapters.each_with_index do |page_chapter, chapter_index|
@@ -24,14 +25,16 @@ page_books.each_with_index do |page_book, book_index|
     form.c=page_chapter.attr('value')
     page = form.submit
     doc = page.parser
+
+    puts "Parsed.." + page_book.text + "" + page_chapter.text
     page_verses = doc.css('.zef_bible_Chapter .zef_verse')
     page_verse_numbers = doc.css('.zef_bible_Chapter .zef_verse_number')
     page_verses.each_with_index do |page_verse, verse_index|
       p_verse = page_verse.text.strip
-      p_number = page_verse_numbers[verse_number].text.strip
-      BibleVerse.create(language: language.id, 
-                        version: version, 
-                        book: Book.find(book_index), 
+      p_number = page_verse_numbers[verse_index].text.strip
+      BibleVerse.create(language_id: language.id,
+                        version_id: version.id,
+                        book_id: Book.find(book_index + 1).id,
                         chapter: page_chapter.text.strip,
                         verse: p_number,
                         misc_data: p_verse,
