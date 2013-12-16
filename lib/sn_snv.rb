@@ -12,7 +12,8 @@ language = Language.find_by_ref('SN')
 version = Version.find_by_short_name('SNV')
 
 page_books = doc.css('#book option')
-page_books.each_with_index do |page_book, book_index|
+page_books = page_books[53..66]
+page_books.each_with_index do |page_book|
   form = agent.page.forms[2]
   form.b = page_book.attr('value')
   page = form.submit
@@ -34,7 +35,7 @@ page_books.each_with_index do |page_book, book_index|
       p_number = page_verse_numbers[verse_index].text.strip
       BibleVerse.create(language_id: language.id,
                         version_id: version.id,
-                        book_id: Book.find(book_index + 1).id,
+                        book_id: Book.find(page_book.attr('value')[/\d+/]).id,
                         chapter: page_chapter.text.strip,
                         verse: p_number,
                         misc_data: p_verse,
