@@ -12,8 +12,7 @@ language = Language.find_by_ref('SN')
 version = Version.find_by_short_name('SNV')
 
 page_books = doc.css('#book option')
-page_books = page_books[53..66]
-page_books.each_with_index do |page_book|
+page_books.each do |page_book|
   form = agent.page.forms[2]
   form.b = page_book.attr('value')
   page = form.submit
@@ -21,7 +20,7 @@ page_books.each_with_index do |page_book|
   puts "Parsed.." + page_book.text
 
   page_chapters = doc.css('#chapter option')
-  page_chapters.each_with_index do |page_chapter, chapter_index|
+  page_chapters.each do |page_chapter|
     form = agent.page.forms[2]
     form.c=page_chapter.attr('value')
     page = form.submit
