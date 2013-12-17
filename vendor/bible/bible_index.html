@@ -21,7 +21,7 @@
 
         $('#tags').keyup(function(e) { 
           elem = e.target || e.srcElement;
-          var regExp = /^([1]|[2]|[A-z]+)\s(\d*)[:]?(\S*)/
+          var regExp = /^([1-3]?[\s]?[A-z]+)\s(\d*)[:]?(\S*)/
           var regExpArr = regExp.exec(elem.value)
           if(regExpArr) {
               console.log(elem.value)
@@ -48,6 +48,7 @@
       });
 
       printChapters = function(english, tamil, sinhalese) {
+				$("#content table").html('')
         $.each(english[0],function(i, chapters) {
           tamilChapters = tamil[0][i]
           sinhaleseChapters = sinhalese[0][i]
