@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/style.css" />
     <script>
       books = null
+      chosenBook = null
       $(function() {
         $.getJSON("json/books.json").done(function(response) {
           books = response
@@ -23,36 +24,38 @@
           var regExp = /^([1]|[2]|[A-z]+)\s(\d*)[:]?(\S*)/
           var regExpArr = regExp.exec(elem.value)
           if(regExpArr) {
-		console.log(elem.value)
-		 var splitVar = elem.value.split(/\s/);
-            var re = new RegExp(((/\d/.test(splitVar[0]) && (splitVar.length > 1)) ? (splitVar[0] + " " + splitVar[1]) : splitVar[0]), "i");
-            chosenBook = $.grep(books, function (a) {return re.test(a);})[0];
-		console.log(chosenBook)
-            chosenChapter = regExpArr[2];
-            chosenVerses = fetchVerseArray(regExpArr[3]);
+              console.log(elem.value)
+              var splitVar = elem.value.split(/\s/);
+              var re = new RegExp(((/\d/.test(splitVar[0]) && (splitVar.length > 1)) ? (splitVar[0] + " " + splitVar[1]) : splitVar[0]), "i");
+              chosenBook = $.grep(books, function (a) {return re.test(a);})[0];
+              console.log(chosenBook)
+              chosenChapter = regExpArr[2];
+              chosenVerses = fetchVerseArray(regExpArr[3]);
 
-            if(chosenBook) {
-              $("#content").html("<table></table>");
-              columns = 0
-              $.when( 
-                $.getJSON("json/"+chosenBook+"_en_nkjv.json"),
-                $.getJSON("json/"+chosenBook+"_ta_tav.json")
-              ).done(printChapters);
+              if(chosenBook) {
+                  $("#content").html("<table></table>");
+                  columns = 0
+                  $.when( 
+                    $.getJSON("json/"+chosenBook+"_en_nkjv.json"),
+                    $.getJSON("json/"+chosenBook+"_ta_tav.json"),
+                    $.getJSON("json/"+chosenBook+"_sn_snv.json")
+                  ).done(printChapters);
 
-            }
+              }
           }
           
         });
       });
 
-      printChapters = function(english, tamil) {
+      printChapters = function(english, tamil, sinhalese) {
         $.each(english[0],function(i, chapters) {
           tamilChapters = tamil[0][i]
+          sinhaleseChapters = sinhalese[0][i]
           if(!chosenChapter || chosenChapter==i) {
-            $("#content table").append("<tr><th colspan=2><br />CHAPTER " + (i) + "<br /></th></tr>");
+            $("#content table").append("<tr><th colspan=3><br /> " + chosenBook + " " + (i) + "<br /></th></tr>");
             $.each(chapters, function(j, verses){
               if(!chosenVerses || $.inArray(verses.verse, chosenVerses)!=-1) {
-                $("#content table").append("<tr><td><br /> " + verses.verse_text + "<br /></td><td>"+tamilChapters[j].verse_text+"</td></tr>");
+                $("#content table").append("<tr><td><br /> " + verses.verse_text + "<br /></td><td>"+tamilChapters[j].verse_text+"</td><td>"+sinhaleseChapters[j].verse_text+"</td></tr>");
               }
             });
           }
