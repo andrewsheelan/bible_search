@@ -1,4 +1,4 @@
-class CreateSinhalaBooks < ActiveRecord::Migration
+class CreateSinhalaBooks < ActiveRecord::Migration[6.1]
   def change
     create_table :sinhala_books do |t|
       t.string :name
@@ -7,6 +7,5 @@ class CreateSinhalaBooks < ActiveRecord::Migration
 
       t.timestamps
     end
-    add_index :sinhala_books, :book_id
   end
 end

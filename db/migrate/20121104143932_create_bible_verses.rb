@@ -1,4 +1,4 @@
-class CreateBibleVerses < ActiveRecord::Migration
+class CreateBibleVerses < ActiveRecord::Migration[6.1]
   def change
     create_table :bible_verses do |t|
       t.references :language
@@ -10,8 +10,5 @@ class CreateBibleVerses < ActiveRecord::Migration
 
       t.timestamps
     end
-    add_index :bible_verses, :language_id
-    add_index :bible_verses, :version_id
-    add_index :bible_verses, :book_id
   end
 end

@@ -1,6 +1,6 @@
 require 'open-uri'
 root_url = 'http://www.biblegateway.com'
-en_nkjv_bible_index = Nokogiri::HTML(open("#{root_url}/versions/New-King-James-Version-NKJV-Bible/"))
+en_nkjv_bible_index = Nokogiri::HTML(URI.open("#{root_url}/versions/New-King-James-Version-NKJV-Bible/"))
 books_data = en_nkjv_bible_index.css(".infotable tr")
 
 # Code to create the books in the bible
@@ -21,7 +21,7 @@ books_data.each_with_index do |book_data, index|
     chapters.each do |chapter_tags|
       chapter_url = chapter_tags.attr('href')
       chapter = chapter_tags.text
-      verses_data =  Nokogiri::HTML(open(root_url + chapter_url))
+      verses_data =  Nokogiri::HTML(URI.open(root_url + chapter_url))
       verses = verses_data.css('.passage').css('p span.text')
       verses.each do |verse|
         verse_number = verse.attr('class').slice(/\d+$/)
