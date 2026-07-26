@@ -9,7 +9,7 @@ Scope: Modernize the static GitHub Pages reader under `docs/` only. Treat `vendo
 - Book + chapter dropdown navigation (no free-text “Tags” field).
 - Always-visible English column; optional Tamil and Sinhala columns (default on).
 - Browser speech reader for English: play/pause, prev/next verse, speed, highlight + scroll.
-- Light, Dark, and High contrast themes; mobile-friendly layout.
+- Light, Dark, High contrast light, and High contrast dark themes; mobile-friendly layout.
 - Persist preferences in `localStorage`.
 
 ## Non-goals
@@ -78,11 +78,12 @@ Three mutually exclusive modes via a segmented control or `<select>`:
 |------|--------|
 | **Light** | Default clean modern reader — light neutrals, dark text |
 | **Dark** | Dark surface, light text, muted borders; comfortable night reading |
-| **High contrast** | Near-black on near-white (or inverse if needed for WCAG), strong borders, stronger highlight |
+| **High contrast light** | Near-black on near-white, strong borders, yellow highlight |
+| **High contrast dark** | Near-white on near-black, yellow accent, blue highlight |
 
 Implementation:
 
-- `data-theme="light|dark|high-contrast"` on `<html>` or `<body>`.
+- `data-theme="light|dark|high-contrast|high-contrast-dark"` on `<html>` or `<body>`.
 - CSS variables for background, text, muted text, border, accent, highlight, toolbar surface.
 - No purple/glow aesthetic; avoid generic AI-default purple gradients.
 
@@ -90,7 +91,7 @@ Implementation:
 
 Keys (names illustrative):
 
-- `bible-reader-theme`: `light` | `dark` | `high-contrast`
+- `bible-reader-theme`: `light` | `dark` | `high-contrast` | `high-contrast-dark`
 - `bible-reader-show-tamil`: boolean
 - `bible-reader-show-sinhala`: boolean
 - `bible-reader-rate`: number
@@ -127,7 +128,7 @@ Alignment: render by English verse index; if Tamil/Sinhala entry missing, leave 
 
 - Genesis 1 and John 3 load; Song of Solomon fetches correctly (spaces).
 - Tamil/Sinhala hide/show; English always visible.
-- Light / Dark / High contrast switch and persist across reload.
+- Light / Dark / High contrast light / High contrast dark switch and persist across reload.
 - Play → pause → play; prev/next while playing; speed change; end of chapter stops.
 - Desktop three-column vs mobile stacked-per-verse.
 - Resize across 768px breakpoint.

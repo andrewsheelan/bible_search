@@ -47,7 +47,12 @@
   }
 
   function applyTheme(theme) {
-    var allowed = { light: 1, dark: 1, "high-contrast": 1 };
+    var allowed = {
+      light: 1,
+      dark: 1,
+      "high-contrast": 1,
+      "high-contrast-dark": 1
+    };
     if (!allowed[theme]) theme = "light";
     document.documentElement.setAttribute("data-theme", theme);
     els.themeSelect.value = theme;
@@ -124,9 +129,16 @@
       .replace(/"/g, "&quot;");
   }
 
+  function stripLeadingVerseNumber(text) {
+    // JSON includes "1 …" / "1. …" in verse_text; UI already shows the verse number.
+    return String(text || "")
+      .replace(/^\s*\d+\.?\s*[\u00a0\u202f]*/u, "")
+      .replace(/^\s+/, "");
+  }
+
   function cellText(arr, index) {
     if (!arr || !arr[index]) return "";
-    return arr[index].verse_text || "";
+    return stripLeadingVerseNumber(arr[index].verse_text || "");
   }
 
   function renderChapter(chapterKey) {
@@ -234,6 +246,13 @@
     });
   }
 
+  function setMenuOpen(open) {
+    if (!els.toolbarMenu || !els.menuToggle) return;
+    els.toolbarMenu.hidden = !open;
+    els.menuToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    els.menuToggle.textContent = open ? "Close" : "Menu";
+  }
+
   function bindEvents() {
     els.bookSelect.addEventListener("change", function () {
       if (reader) reader.pause();
@@ -255,6 +274,14 @@
 
     els.rateSelect.addEventListener("change", function () {
       writeStore(STORAGE.rate, els.rateSelect.value);
+    });
+
+    els.menuToggle.addEventListener("click", function () {
+      setMenuOpen(els.toolbarMenu.hidden);
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") setMenuOpen(false);
     });
   }
 
@@ -284,7 +311,9 @@
       btnNext: $("btn-next"),
       rateSelect: $("rate-select"),
       readerStatus: $("reader-status"),
-      content: $("content")
+      content: $("content"),
+      menuToggle: $("menu-toggle"),
+      toolbarMenu: $("toolbar-menu")
     };
 
     restorePrefs();
