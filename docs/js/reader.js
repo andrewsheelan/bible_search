@@ -180,8 +180,11 @@
   };
 
   BibleReader.prototype._syncPlayLabel = function () {
-    this.btnPlay.textContent = this.playing ? "Pause" : "Play";
-    this.btnPlay.setAttribute("aria-label", this.playing ? "Pause" : "Play");
+    var label = this.playing ? "Pause" : "Play";
+    this.btnPlay.setAttribute("aria-label", label);
+    this.btnPlay.classList.toggle("is-playing", this.playing);
+    var textEl = this.btnPlay.querySelector(".btn-text");
+    if (textEl) textEl.textContent = label;
   };
 
   BibleReader.prototype._applyHighlight = function () {

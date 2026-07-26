@@ -343,7 +343,9 @@
     if (!els.toolbarMenu || !els.menuToggle) return;
     els.toolbarMenu.hidden = !open;
     els.menuToggle.setAttribute("aria-expanded", open ? "true" : "false");
-    els.menuToggle.textContent = open ? "Close" : "Menu";
+    els.menuToggle.setAttribute("aria-label", open ? "Close menu" : "Menu");
+    var textEl = els.menuToggle.querySelector(".btn-text");
+    if (textEl) textEl.textContent = open ? "Close" : "Menu";
   }
 
   function bindEvents() {
