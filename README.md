@@ -6,6 +6,7 @@ Multilingual Bible reader (English NKJV, Tamil, Sinhala) with a modern static UI
 
 ## Features
 
+- Compact one-line toolbar with expandable Menu (languages, theme, speed)
 - Book and chapter dropdowns (Old / New Testament groups)
 - Side-by-side English, Tamil, and Sinhala (English always on; Tamil/Sinhala optional)
 - English text-to-speech: play / pause, previous / next verse, speed control
@@ -23,6 +24,10 @@ Multilingual Bible reader (English NKJV, Tamil, Sinhala) with a modern static UI
 
 ![Bible Reader dark theme](docs/screenshots/theme-dark.png)
 
+### Dark with menu open
+
+![Bible Reader dark theme with menu open](docs/screenshots/theme-dark-menu-open.png)
+
 ### High contrast light
 
 ![Bible Reader high contrast light theme](docs/screenshots/theme-high-contrast-light.png)
@@ -34,6 +39,10 @@ Multilingual Bible reader (English NKJV, Tamil, Sinhala) with a modern static UI
 ### Mobile
 
 ![Bible Reader on mobile](docs/screenshots/mobile-light.png)
+
+### Mobile with menu open
+
+![Bible Reader mobile menu](docs/screenshots/mobile-light-menu-open.png)
 
 To replace or add screenshots, drop PNGs into `docs/screenshots/` and link them above.
 
