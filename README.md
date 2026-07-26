@@ -6,13 +6,13 @@ Multilingual Bible reader (English NKJV, Tamil, Sinhala) with speech playback. T
 
 ## Features
 
-- One-line toolbar: book, chapter, Prev / Play / Next, and **Menu**
-- Menu controls: Tamil / Sinhala toggles, theme, voice, reading speed
+- Book and chapter dropdowns (Old / New Testament groups)
 - English always visible; Tamil and Sinhala optional (on by default)
-- Book and chapter dropdowns grouped by Old / New Testament
-- English text-to-speech with verse highlight, prev/next, speed, and voice picker (prefers higher-quality system voices when available)
+- English text-to-speech with verse highlight, prev/next, speed, and voice picker
 - Themes: Light, Dark, High contrast light, High contrast dark
-- Desktop: parallel language columns · Mobile: languages stacked per verse
+- **Desktop:** book/chapter in the top bar; Prev / Play / Next / Menu on the right; parallel language columns
+- **Mobile:** book/chapter only in the top bar; floating bottom dock for playback and Menu; languages stacked per verse
+- Menu: language toggles, theme, voice, reading speed
 - Preferences saved in `localStorage` (theme, languages, voice, speed, last book/chapter)
 - Installable PWA with offline app shell; opened chapters are cached for re-reading offline
 
@@ -49,9 +49,13 @@ After the first visit, the app shell works offline. Verse text for chapters you 
 
 ![Bible Reader high contrast dark theme](docs/screenshots/theme-high-contrast-dark.png)
 
-### Mobile
+### Mobile (floating playback dock)
 
 ![Bible Reader on mobile](docs/screenshots/mobile-light.png)
+
+### Mobile dark
+
+![Bible Reader mobile dark](docs/screenshots/mobile-dark.png)
 
 ### Mobile with menu open
 

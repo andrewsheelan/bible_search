@@ -33,104 +33,107 @@
           <select id="chapter-select" aria-label="Chapter"></select>
         </label>
       </div>
+    </div>
+  </header>
 
-      <div class="toolbar-reader-compact" id="reader-controls">
-        <button type="button" id="btn-prev" class="btn-tool" aria-label="Previous verse">
-          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path fill="currentColor" d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-          </svg>
-          <span class="btn-text">Prev</span>
-        </button>
-        <button type="button" id="btn-play" class="btn-tool btn-primary" aria-label="Play">
-          <svg class="btn-icon icon-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path fill="currentColor" d="M8 5v14l11-7z"/>
-          </svg>
-          <svg class="btn-icon icon-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path fill="currentColor" d="M6 5h4v14H6zm8 0h4v14h-4z"/>
-          </svg>
-          <span class="btn-text">Play</span>
-        </button>
-        <button type="button" id="btn-next" class="btn-tool" aria-label="Next verse">
-          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path fill="currentColor" d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-          </svg>
-          <span class="btn-text">Next</span>
-        </button>
-      </div>
-
-      <button
-        type="button"
-        id="menu-toggle"
-        class="btn-tool menu-toggle"
-        aria-expanded="false"
-        aria-controls="toolbar-menu"
-        aria-label="Menu"
-      >
-        <svg class="btn-icon icon-menu" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/>
+  <!-- Outside sticky/filtered header so position:fixed works on mobile -->
+  <div class="player-dock" id="player-dock">
+    <div class="toolbar-reader-compact" id="reader-controls">
+      <button type="button" id="btn-prev" class="btn-tool" aria-label="Previous verse">
+        <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
         </svg>
-        <svg class="btn-icon icon-close" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        <span class="btn-text">Prev</span>
+      </button>
+      <button type="button" id="btn-play" class="btn-tool btn-primary" aria-label="Play">
+        <svg class="btn-icon icon-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M8 5v14l11-7z"/>
         </svg>
-        <span class="btn-text">Menu</span>
+        <svg class="btn-icon icon-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M6 5h4v14H6zm8 0h4v14h-4z"/>
+        </svg>
+        <span class="btn-text">Play</span>
+      </button>
+      <button type="button" id="btn-next" class="btn-tool" aria-label="Next verse">
+        <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+        </svg>
+        <span class="btn-text">Next</span>
       </button>
     </div>
 
-    <div id="toolbar-menu" class="toolbar-menu" hidden>
-      <div class="menu-section" role="group" aria-label="Languages">
-        <p class="menu-heading">Languages</p>
-        <div class="menu-row">
-          <span class="lang-fixed" title="Always shown">English · NKJV</span>
-          <label class="check">
-            <input type="checkbox" id="toggle-tamil" checked />
-            <span>Tamil</span>
-          </label>
-          <label class="check">
-            <input type="checkbox" id="toggle-sinhala" checked />
-            <span>Sinhala</span>
-          </label>
-        </div>
-      </div>
+    <button
+      type="button"
+      id="menu-toggle"
+      class="btn-tool menu-toggle"
+      aria-expanded="false"
+      aria-controls="toolbar-menu"
+      aria-label="Menu"
+    >
+      <svg class="btn-icon icon-menu" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/>
+      </svg>
+      <svg class="btn-icon icon-close" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+      </svg>
+      <span class="btn-text">Menu</span>
+    </button>
+  </div>
 
-      <div class="menu-section">
-        <p class="menu-heading">Theme</p>
-        <label class="field">
-          <span class="visually-hidden">Theme</span>
-          <select id="theme-select" aria-label="Theme">
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-            <option value="high-contrast">High contrast light</option>
-            <option value="high-contrast-dark">High contrast dark</option>
-          </select>
+  <div id="toolbar-menu" class="toolbar-menu" hidden>
+    <div class="menu-section" role="group" aria-label="Languages">
+      <p class="menu-heading">Languages</p>
+      <div class="menu-row">
+        <span class="lang-fixed" title="Always shown">English · NKJV</span>
+        <label class="check">
+          <input type="checkbox" id="toggle-tamil" checked />
+          <span>Tamil</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="toggle-sinhala" checked />
+          <span>Sinhala</span>
         </label>
       </div>
-
-      <div class="menu-section">
-        <p class="menu-heading">Voice</p>
-        <label class="field">
-          <span class="visually-hidden">Voice</span>
-          <select id="voice-select" aria-label="Reading voice">
-            <option value="">Loading voices…</option>
-          </select>
-        </label>
-      </div>
-
-      <div class="menu-section">
-        <p class="menu-heading">Reading speed</p>
-        <label class="field">
-          <span class="visually-hidden">Speed</span>
-          <select id="rate-select" aria-label="Reading speed">
-            <option value="0.75">0.75×</option>
-            <option value="1" selected>1×</option>
-            <option value="1.25">1.25×</option>
-            <option value="1.5">1.5×</option>
-          </select>
-        </label>
-      </div>
-
-      <p id="reader-status" class="reader-status" hidden></p>
     </div>
-  </header>
+
+    <div class="menu-section">
+      <p class="menu-heading">Theme</p>
+      <label class="field">
+        <span class="visually-hidden">Theme</span>
+        <select id="theme-select" aria-label="Theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="high-contrast">High contrast light</option>
+          <option value="high-contrast-dark">High contrast dark</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="menu-section">
+      <p class="menu-heading">Voice</p>
+      <label class="field">
+        <span class="visually-hidden">Voice</span>
+        <select id="voice-select" aria-label="Reading voice">
+          <option value="">Loading voices…</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="menu-section">
+      <p class="menu-heading">Reading speed</p>
+      <label class="field">
+        <span class="visually-hidden">Speed</span>
+        <select id="rate-select" aria-label="Reading speed">
+          <option value="0.75">0.75×</option>
+          <option value="1" selected>1×</option>
+          <option value="1.25">1.25×</option>
+          <option value="1.5">1.5×</option>
+        </select>
+      </label>
+    </div>
+
+    <p id="reader-status" class="reader-status" hidden></p>
+  </div>
 
   <main id="content" class="content" aria-live="polite">
     <p class="empty-state">Loading…</p>
