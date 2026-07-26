@@ -3,7 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Multilingual Bible reader — English, Tamil, and Sinhala with English speech playback." />
+  <meta name="theme-color" content="#0f6b5c" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Bible Reader" />
   <title>Bible Reader</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet" />
@@ -67,6 +76,16 @@
             <option value="dark">Dark</option>
             <option value="high-contrast">High contrast light</option>
             <option value="high-contrast-dark">High contrast dark</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="menu-section">
+        <p class="menu-heading">Voice</p>
+        <label class="field">
+          <span class="visually-hidden">Voice</span>
+          <select id="voice-select" aria-label="Reading voice">
+            <option value="">Loading voices…</option>
           </select>
         </label>
       </div>

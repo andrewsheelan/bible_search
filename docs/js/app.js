@@ -6,6 +6,7 @@
     tamil: "bible-reader-show-tamil",
     sinhala: "bible-reader-show-sinhala",
     rate: "bible-reader-rate",
+    voice: "bible-reader-voice",
     book: "bible-reader-book",
     chapter: "bible-reader-chapter"
   };
@@ -228,6 +229,97 @@
       });
   }
 
+  function scoreEnglishVoice(voice) {
+    var name = (voice.name || "").toLowerCase();
+    var lang = (voice.lang || "").toLowerCase();
+    var isEnglish =
+      lang.indexOf("en") === 0 || name.indexOf("english") !== -1;
+    if (!isEnglish) return -1;
+
+    var score = 10;
+    if (lang === "en-us" || lang.indexOf("en-us") === 0) score += 50;
+    else if (lang.indexOf("en-gb") === 0) score += 35;
+    else if (lang.indexOf("en-au") === 0 || lang.indexOf("en-in") === 0) score += 28;
+    else score += 18;
+
+    if (name.indexOf("google") !== -1) score += 45;
+    if (name.indexOf("microsoft") !== -1) score += 40;
+    if (/neural|natural|enhanced|premium|online|super/.test(name)) score += 30;
+    if (/aria|jenny|guy|sara|sonia|ryan|davis|amy|emma|samantha|susan|daniel/.test(name)) {
+      score += 15;
+    }
+    if (/espeak|compact|whisper|robot/.test(name)) score -= 25;
+    return score;
+  }
+
+  function populateVoiceSelect() {
+    if (!els.voiceSelect || !window.speechSynthesis) {
+      if (els.voiceSelect) {
+        els.voiceSelect.innerHTML = '<option value="">No voices available</option>';
+        els.voiceSelect.disabled = true;
+      }
+      return;
+    }
+
+    var voices = window.speechSynthesis.getVoices() || [];
+    var english = voices
+      .map(function (v) {
+        return { voice: v, score: scoreEnglishVoice(v) };
+      })
+      .filter(function (item) {
+        return item.score >= 0;
+      })
+      .sort(function (a, b) {
+        return b.score - a.score || a.voice.name.localeCompare(b.voice.name);
+      });
+
+    if (!english.length) {
+      els.voiceSelect.innerHTML = '<option value="">No English voices found</option>';
+      els.voiceSelect.disabled = true;
+      return;
+    }
+
+    els.voiceSelect.disabled = false;
+    var saved = readStore(STORAGE.voice, "");
+    var html = "";
+    var hasSaved = false;
+
+    english.forEach(function (item, index) {
+      var v = item.voice;
+      var uri = v.voiceURI || v.name;
+      if (uri === saved) hasSaved = true;
+      var label = v.name + (v.lang ? " (" + v.lang + ")" : "");
+      if (index === 0) label += " — recommended";
+      html +=
+        '<option value="' +
+        escapeHtml(uri) +
+        '">' +
+        escapeHtml(label) +
+        "</option>";
+    });
+
+    els.voiceSelect.innerHTML = html;
+    els.voiceSelect.value = hasSaved ? saved : english[0].voice.voiceURI || english[0].voice.name;
+    writeStore(STORAGE.voice, els.voiceSelect.value);
+
+    if (reader && typeof reader.setVoiceByURI === "function") {
+      reader.setVoiceByURI(els.voiceSelect.value);
+    }
+  }
+
+  function initVoices() {
+    populateVoiceSelect();
+    if (!window.speechSynthesis) return;
+
+    // Chrome loads voices asynchronously
+    if (typeof window.speechSynthesis.onvoiceschanged !== "undefined") {
+      window.speechSynthesis.onvoiceschanged = populateVoiceSelect;
+    }
+    // Fallback retry — some browsers populate late
+    setTimeout(populateVoiceSelect, 250);
+    setTimeout(populateVoiceSelect, 1000);
+  }
+
   function initReader() {
     if (reader) reader.destroy();
     reader = new window.BibleReader({
@@ -242,6 +334,7 @@
       btnPrev: els.btnPrev,
       btnNext: els.btnNext,
       rateSelect: els.rateSelect,
+      voiceSelect: els.voiceSelect,
       statusEl: els.readerStatus
     });
   }
@@ -274,6 +367,10 @@
 
     els.rateSelect.addEventListener("change", function () {
       writeStore(STORAGE.rate, els.rateSelect.value);
+    });
+
+    els.voiceSelect.addEventListener("change", function () {
+      writeStore(STORAGE.voice, els.voiceSelect.value);
     });
 
     els.menuToggle.addEventListener("click", function () {
@@ -310,6 +407,7 @@
       btnPlay: $("btn-play"),
       btnNext: $("btn-next"),
       rateSelect: $("rate-select"),
+      voiceSelect: $("voice-select"),
       readerStatus: $("reader-status"),
       content: $("content"),
       menuToggle: $("menu-toggle"),
@@ -319,6 +417,7 @@
     restorePrefs();
     bindEvents();
     initReader();
+    initVoices();
     applyLangVisibility();
 
     fetch("json/books.json")
@@ -344,5 +443,13 @@
     document.addEventListener("DOMContentLoaded", init);
   } else {
     init();
+  }
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("./sw.js").catch(function () {
+        /* ignore registration failures on file:// or unsupported hosts */
+      });
+    });
   }
 })();

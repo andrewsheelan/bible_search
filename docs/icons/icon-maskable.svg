@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Bible Reader">
+  <rect width="512" height="512" fill="#0f6b5c"/>
+  <g transform="translate(56 56) scale(0.78)">
+    <path fill="#fffcf7" d="M96 150c48 0 88 18 120 42v210c-32-28-72-44-120-44-14 0-28 1-40 4V154c12-3 26-4 40-4zm320 0c14 0 28 1 40 4v208c-12-3-26-4-40-4-48 0-88 16-120 44V192c32-24 72-42 120-42z"/>
+    <path fill="#d8efe8" d="M256 192v210c-16-14-36-26-60-34V170c20 10 40 18 60 22zm0 0c20-4 40-12 60-22v198c-24 8-44 20-60 34V192z"/>
+    <rect x="248" y="168" width="16" height="240" rx="4" fill="#0a4a40"/>
+  </g>
+</svg>

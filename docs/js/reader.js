@@ -10,6 +10,7 @@
    *   btnPrev: HTMLButtonElement,
    *   btnNext: HTMLButtonElement,
    *   rateSelect: HTMLSelectElement,
+   *   voiceSelect?: HTMLSelectElement,
    *   statusEl: HTMLElement
    * }} options
    */
@@ -20,16 +21,19 @@
     this.btnPrev = options.btnPrev;
     this.btnNext = options.btnNext;
     this.rateSelect = options.rateSelect;
+    this.voiceSelect = options.voiceSelect || null;
     this.statusEl = options.statusEl;
 
     this.index = 0;
     this.playing = false;
     this.rate = parseFloat(this.rateSelect.value) || 1;
+    this.voice = null;
     this._bound = {
       play: this.togglePlay.bind(this),
       prev: this.prev.bind(this),
       next: this.next.bind(this),
-      rate: this._onRateChange.bind(this)
+      rate: this._onRateChange.bind(this),
+      voice: this._onVoiceChange.bind(this)
     };
 
     if (!global.speechSynthesis) {
@@ -39,6 +43,7 @@
       this.btnPrev.disabled = true;
       this.btnNext.disabled = true;
       this.rateSelect.disabled = true;
+      if (this.voiceSelect) this.voiceSelect.disabled = true;
       this.unsupported = true;
       return;
     }
@@ -48,6 +53,10 @@
     this.btnPrev.addEventListener("click", this._bound.prev);
     this.btnNext.addEventListener("click", this._bound.next);
     this.rateSelect.addEventListener("change", this._bound.rate);
+    if (this.voiceSelect) {
+      this.voiceSelect.addEventListener("change", this._bound.voice);
+      this._onVoiceChange();
+    }
     this._syncPlayLabel();
   }
 
@@ -59,9 +68,36 @@
     }
   };
 
+  BibleReader.prototype._onVoiceChange = function () {
+    this.voice = this._resolveSelectedVoice();
+    if (this.playing) {
+      this._cancelUtterance();
+      this._speakCurrent();
+    }
+  };
+
+  BibleReader.prototype._resolveSelectedVoice = function () {
+    if (!this.voiceSelect || !global.speechSynthesis) return null;
+    var uri = this.voiceSelect.value;
+    if (!uri) return null;
+    var voices = global.speechSynthesis.getVoices() || [];
+    for (var i = 0; i < voices.length; i++) {
+      if (voices[i].voiceURI === uri || voices[i].name === uri) {
+        return voices[i];
+      }
+    }
+    return null;
+  };
+
   BibleReader.prototype.setRate = function (rate) {
     this.rate = rate;
     this.rateSelect.value = String(rate);
+  };
+
+  BibleReader.prototype.setVoiceByURI = function (uri) {
+    if (!this.voiceSelect) return;
+    this.voiceSelect.value = uri;
+    this._onVoiceChange();
   };
 
   BibleReader.prototype.resetToStart = function () {
@@ -79,6 +115,9 @@
     this.btnPrev.removeEventListener("click", this._bound.prev);
     this.btnNext.removeEventListener("click", this._bound.next);
     this.rateSelect.removeEventListener("change", this._bound.rate);
+    if (this.voiceSelect) {
+      this.voiceSelect.removeEventListener("change", this._bound.voice);
+    }
   };
 
   BibleReader.prototype.togglePlay = function () {
@@ -173,9 +212,16 @@
       return;
     }
 
+    if (!this.voice) {
+      this.voice = this._resolveSelectedVoice();
+    }
+
     var utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = this.rate;
-    utterance.lang = "en-US";
+    utterance.lang = (this.voice && this.voice.lang) || "en-US";
+    if (this.voice) {
+      utterance.voice = this.voice;
+    }
     utterance.onend = function () {
       if (!self.playing) return;
       self.index += 1;
