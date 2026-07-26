@@ -1,30 +1,394 @@
+/* Bible Reader — clean modern study UI */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* —— Themes —— */
+:root,
+[data-theme="light"] {
+  --bg: #f3f0ea;
+  --bg-elevated: #fffcf7;
+  --text: #1c2421;
+  --text-muted: #5a6560;
+  --border: #c9c2b4;
+  --accent: #0f6b5c;
+  --accent-text: #ffffff;
+  --highlight: #d8efe8;
+  --toolbar-bg: rgba(255, 252, 247, 0.92);
+  --shadow: 0 1px 0 rgba(28, 36, 33, 0.06), 0 12px 32px rgba(28, 36, 33, 0.06);
+  --verse-rule: rgba(28, 36, 33, 0.08);
+  --radius: 10px;
+  --font-ui: "Fraunces", Georgia, serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+}
+
+[data-theme="dark"] {
+  --bg: #12181a;
+  --bg-elevated: #1a2226;
+  --text: #e8eee9;
+  --text-muted: #9aaba3;
+  --border: #2f3c40;
+  --accent: #3dbaa0;
+  --accent-text: #06221c;
+  --highlight: #243a36;
+  --toolbar-bg: rgba(18, 24, 26, 0.94);
+  --shadow: 0 1px 0 rgba(0, 0, 0, 0.35), 0 16px 40px rgba(0, 0, 0, 0.35);
+  --verse-rule: rgba(232, 238, 233, 0.08);
+}
+
+[data-theme="high-contrast"] {
+  --bg: #ffffff;
+  --bg-elevated: #ffffff;
+  --text: #000000;
+  --text-muted: #000000;
+  --border: #000000;
+  --accent: #000000;
+  --accent-text: #ffffff;
+  --highlight: #ffff00;
+  --toolbar-bg: #ffffff;
+  --shadow: none;
+  --verse-rule: #000000;
+  --radius: 0;
+}
+
 body {
-	font-family: "Trebuchet MS", "Helvetica", "Arial",  "Verdana", "sans-serif";
-	font-size: 28px;
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  line-height: 1.55;
+  color: var(--text);
+  background:
+    radial-gradient(1200px 500px at 10% -10%, rgba(15, 107, 92, 0.08), transparent 60%),
+    radial-gradient(900px 420px at 100% 0%, rgba(28, 36, 33, 0.05), transparent 55%),
+    var(--bg);
 }
 
-table {
-  font-family: verdana,arial,sans-serif;
-  font-size:28px;
-  color:#333333;
-  border-width: 1px;
-  border-color: #999999;
-  border-collapse: collapse;
-}
-table th {
-  background-color:#c3dde0;
-  border-width: 1px;
-  padding: 8px;
-  border-style: solid;
-  border-color: #a9c6c9;
-}
-table tr {
-  background-color:#d4e3e5;
-}
-table td {
-  border-width: 1px;
-  padding: 8px;
-  border-style: solid;
-  border-color: #a9c6c9;
+[data-theme="dark"] body {
+  background:
+    radial-gradient(1000px 480px at 0% 0%, rgba(61, 186, 160, 0.08), transparent 55%),
+    var(--bg);
 }
 
+[data-theme="high-contrast"] body {
+  background: var(--bg);
+}
+
+/* —— Toolbar —— */
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.85rem 1.25rem;
+  padding: 0.85rem 1.25rem;
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+}
+
+.toolbar-brand {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  align-self: center;
+  margin-right: 0.25rem;
+}
+
+.toolbar-nav,
+.toolbar-langs,
+.toolbar-theme,
+.toolbar-reader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.65rem 0.85rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.field-label {
+  font-family: var(--font-ui);
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+[data-theme="high-contrast"] .field-label {
+  color: var(--text);
+  font-weight: 700;
+}
+
+select,
+button {
+  font: inherit;
+  font-size: 0.95rem;
+  min-height: 44px;
+  padding: 0.45rem 0.75rem;
+  color: var(--text);
+  background: var(--bg-elevated);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+select:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  min-width: 5.5rem;
+}
+
+.lang-fixed {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.65rem;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  border-left: 3px solid var(--accent);
+}
+
+[data-theme="high-contrast"] .lang-fixed {
+  color: var(--text);
+  border-left-width: 4px;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.check input {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--accent);
+}
+
+.reader-buttons {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.reader-status {
+  margin: 0;
+  width: 100%;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* —— Content —— */
+.content {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3.5rem;
+  animation: content-in 0.45s ease both;
+}
+
+@keyframes content-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.empty-state,
+.error-state {
+  font-family: var(--font-ui);
+  color: var(--text-muted);
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.chapter-heading {
+  font-family: var(--font-ui);
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.25rem;
+}
+
+.col-headers {
+  display: none;
+}
+
+.verse-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 2px);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.verse-row {
+  display: grid;
+  gap: 0.65rem 1rem;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--verse-rule);
+  transition: background 0.2s ease;
+}
+
+.verse-row:last-child {
+  border-bottom: none;
+}
+
+.verse-row.is-active {
+  background: var(--highlight);
+}
+
+.verse-num {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--accent);
+  grid-column: 1 / -1;
+}
+
+[data-theme="high-contrast"] .verse-num {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.lang-en,
+.lang-ta,
+.lang-sn {
+  min-width: 0;
+}
+
+.lang-label {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
+}
+
+.verse-text {
+  margin: 0;
+}
+
+.content.hide-ta .lang-ta,
+.content.hide-sn .lang-sn {
+  display: none;
+}
+
+/* Mobile: one column, languages stacked per verse */
+@media (max-width: 767px) {
+  .toolbar-brand {
+    width: 100%;
+  }
+
+  .verse-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Desktop: parallel language columns */
+@media (min-width: 768px) {
+  .col-headers {
+    display: grid;
+    gap: 1rem;
+    padding: 0.75rem 1.1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  [data-theme="high-contrast"] .col-headers {
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  /* English + optional columns: headers and rows share the same template */
+  .content:not(.hide-ta):not(.hide-sn) .col-headers,
+  .content:not(.hide-ta):not(.hide-sn) .verse-row {
+    grid-template-columns: 2.5rem 1fr 1fr 1fr;
+  }
+
+  .content.hide-ta:not(.hide-sn) .col-headers,
+  .content.hide-ta:not(.hide-sn) .verse-row,
+  .content.hide-sn:not(.hide-ta) .col-headers,
+  .content.hide-sn:not(.hide-ta) .verse-row {
+    grid-template-columns: 2.5rem 1fr 1fr;
+  }
+
+  .content.hide-ta.hide-sn .col-headers,
+  .content.hide-ta.hide-sn .verse-row {
+    grid-template-columns: 2.5rem 1fr;
+  }
+
+  .verse-row {
+    align-items: start;
+  }
+
+  .verse-num {
+    grid-column: auto;
+    padding-top: 0.15rem;
+  }
+
+  .lang-label {
+    display: none;
+  }
+
+  .col-headers .h-num {
+    /* spacer matching verse number column */
+  }
+}
