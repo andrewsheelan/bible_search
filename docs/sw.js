@@ -1,5 +1,5 @@
 /* Bible Reader service worker — app shell + runtime JSON cache */
-var CACHE_VERSION = "bible-reader-v1";
+var CACHE_VERSION = "bible-reader-v2";
 var SHELL_CACHE = CACHE_VERSION + "-shell";
 var DATA_CACHE = CACHE_VERSION + "-data";
 
@@ -9,11 +9,13 @@ var SHELL_URLS = [
   "./css/style.css",
   "./js/app.js",
   "./js/reader.js",
+  "./js/plan.js",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/apple-touch-icon.png",
-  "./json/books.json"
+  "./json/books.json",
+  "./json/reading-plan.json"
 ];
 
 self.addEventListener("install", function (event) {

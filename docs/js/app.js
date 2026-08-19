@@ -187,8 +187,39 @@
     els.content.innerHTML = html;
     applyLangVisibility();
     updateColHeaders();
+    renderPlanJumpNotice();
 
     if (reader) reader.resetToStart();
+  }
+
+  function renderPlanJumpNotice() {
+    var jump = state.planJump;
+    if (!jump) return;
+    var heading = els.content.querySelector(".chapter-heading");
+    if (!heading) return;
+    var notice = document.createElement("div");
+    notice.className = "plan-jump";
+    var chips = "";
+    for (var ch = jump.chapterStart; ch <= jump.chapterEnd; ch++) {
+      chips +=
+        '<button type="button" class="plan-chip' +
+        (String(ch) === String(els.chapterSelect.value) ? " is-active" : "") +
+        '" data-book="' +
+        escapeHtml(jump.book) +
+        '" data-chapter="' +
+        ch +
+        '">' +
+        ch +
+        "</button>";
+    }
+    notice.innerHTML =
+      "<p><strong>Plan reading:</strong> " +
+      escapeHtml(jump.label) +
+      "</p>" +
+      (jump.chapterEnd > jump.chapterStart
+        ? '<div class="plan-chips" aria-label="Chapters in this reading">' + chips + "</div>"
+        : "");
+    heading.insertAdjacentElement("afterend", notice);
   }
 
   function showError(message) {
@@ -351,6 +382,7 @@
   function bindEvents() {
     els.bookSelect.addEventListener("change", function () {
       if (reader) reader.pause();
+      state.planJump = null;
       loadBook(els.bookSelect.value, "1");
     });
 
@@ -377,6 +409,23 @@
 
     els.menuToggle.addEventListener("click", function () {
       setMenuOpen(els.toolbarMenu.hidden);
+    });
+
+    els.content.addEventListener("click", function (e) {
+      var chip = e.target.closest(".plan-chip");
+      if (!chip) return;
+      var book = chip.getAttribute("data-book");
+      var chapter = chip.getAttribute("data-chapter");
+      if (book && chapter) {
+        if (reader) reader.pause();
+        if (state.book === book) {
+          els.chapterSelect.value = String(chapter);
+          writeStore(STORAGE.chapter, String(chapter));
+          renderChapter(String(chapter));
+        } else {
+          loadBook(book, String(chapter));
+        }
+      }
     });
 
     document.addEventListener("keydown", function (e) {
@@ -440,6 +489,17 @@
         showError("Couldn’t load this book. Try again.");
       });
   }
+
+  window.BibleApp = {
+    navigate: function (book, chapter, planJump) {
+      if (reader) reader.pause();
+      setMenuOpen(false);
+      state.planJump = planJump || null;
+      if (els.bookSelect && book) els.bookSelect.value = book;
+      return loadBook(book, String(chapter));
+    },
+    onPlanOpenChange: null
+  };
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);

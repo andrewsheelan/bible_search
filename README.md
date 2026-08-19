@@ -13,7 +13,8 @@ Multilingual Bible reader (English NKJV, Tamil, Sinhala) with speech playback. T
 - **Desktop:** book/chapter in the top bar; Prev / Play / Next / Menu on the right; parallel language columns
 - **Mobile:** book/chapter only in the top bar; floating bottom dock for playback and Menu; languages stacked per verse
 - Menu: language toggles, theme, voice, reading speed
-- Preferences saved in `localStorage` (theme, languages, voice, speed, last book/chapter)
+- **Plan:** self-paced full-Bible reading plan (364 ranges). Mark complete at your own pace, track a progress bar and projected finish date, cancel to reset, restart only after finishing. Tap a range to open it in the reader.
+- Preferences saved in `localStorage` (theme, languages, voice, speed, last book/chapter, reading-plan progress)
 - Installable PWA with offline app shell; opened chapters are cached for re-reading offline
 
 ## Install on your phone
@@ -89,7 +90,8 @@ Open [http://localhost:8080/](http://localhost:8080/).
 | `docs/css/style.css` | Themes and responsive layout |
 | `docs/js/app.js` | Navigation, rendering, preferences, PWA registration |
 | `docs/js/reader.js` | English speech reader |
-| `docs/json/` | Verse data (`*_en_nkjv`, `*_ta_tav`, `*_sn_snv`) |
+| `docs/js/plan.js` | Self-paced reading plan |
+| `docs/json/` | Verse data (`*_en_nkjv`, `*_ta_tav`, `*_sn_snv`) plus `reading-plan.json` |
 | `docs/manifest.webmanifest` | PWA manifest |
 | `docs/sw.js` | Service worker (shell + chapter cache) |
 | `docs/icons/` | App icons |
