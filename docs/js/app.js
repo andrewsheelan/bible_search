@@ -187,39 +187,57 @@
     els.content.innerHTML = html;
     applyLangVisibility();
     updateColHeaders();
-    renderPlanJumpNotice();
+    updatePlanJumpBar();
 
     if (reader) reader.resetToStart();
   }
 
-  function renderPlanJumpNotice() {
+  function updatePlanJumpBar() {
+    var bar = els.planJumpBar;
+    if (!bar) return;
     var jump = state.planJump;
-    if (!jump) return;
-    var heading = els.content.querySelector(".chapter-heading");
-    if (!heading) return;
-    var notice = document.createElement("div");
-    notice.className = "plan-jump";
-    var chips = "";
-    for (var ch = jump.chapterStart; ch <= jump.chapterEnd; ch++) {
-      chips +=
-        '<button type="button" class="plan-chip' +
-        (String(ch) === String(els.chapterSelect.value) ? " is-active" : "") +
-        '" data-book="' +
-        escapeHtml(jump.book) +
-        '" data-chapter="' +
-        ch +
-        '">' +
-        ch +
-        "</button>";
+    if (!jump) {
+      bar.hidden = true;
+      return;
     }
-    notice.innerHTML =
-      "<p><strong>Plan reading:</strong> " +
-      escapeHtml(jump.label) +
-      "</p>" +
-      (jump.chapterEnd > jump.chapterStart
-        ? '<div class="plan-chips" aria-label="Chapters in this reading">' + chips + "</div>"
-        : "");
-    heading.insertAdjacentElement("afterend", notice);
+
+    bar.hidden = false;
+    if (els.planJumpLabel) els.planJumpLabel.textContent = jump.label;
+
+    var chips = els.planJumpChips;
+    if (chips) {
+      if (jump.chapterEnd > jump.chapterStart) {
+        var html = "";
+        var current = String(els.chapterSelect.value);
+        for (var ch = jump.chapterStart; ch <= jump.chapterEnd; ch++) {
+          html +=
+            '<button type="button" class="plan-chip' +
+            (String(ch) === current ? " is-active" : "") +
+            '" data-book="' +
+            escapeHtml(jump.book) +
+            '" data-chapter="' +
+            ch +
+            '">' +
+            ch +
+            "</button>";
+        }
+        chips.innerHTML = html;
+        chips.hidden = false;
+      } else {
+        chips.innerHTML = "";
+        chips.hidden = true;
+      }
+    }
+
+    var btn = els.planMarkComplete;
+    if (btn) {
+      var done = window.BiblePlan && typeof window.BiblePlan.isDone === "function"
+        ? window.BiblePlan.isDone(jump.id)
+        : false;
+      btn.textContent = done ? "Completed" : "Mark complete";
+      btn.classList.toggle("is-complete", done);
+      btn.setAttribute("aria-pressed", done ? "true" : "false");
+    }
   }
 
   function showError(message) {
@@ -411,22 +429,30 @@
       setMenuOpen(els.toolbarMenu.hidden);
     });
 
-    els.content.addEventListener("click", function (e) {
-      var chip = e.target.closest(".plan-chip");
-      if (!chip) return;
-      var book = chip.getAttribute("data-book");
-      var chapter = chip.getAttribute("data-chapter");
-      if (book && chapter) {
-        if (reader) reader.pause();
-        if (state.book === book) {
-          els.chapterSelect.value = String(chapter);
-          writeStore(STORAGE.chapter, String(chapter));
-          renderChapter(String(chapter));
-        } else {
-          loadBook(book, String(chapter));
+    if (els.planJumpBar) {
+      els.planJumpBar.addEventListener("click", function (e) {
+        var chip = e.target.closest(".plan-chip");
+        if (chip) {
+          var book = chip.getAttribute("data-book");
+          var chapter = chip.getAttribute("data-chapter");
+          if (book && chapter) {
+            if (reader) reader.pause();
+            if (state.book === book) {
+              els.chapterSelect.value = String(chapter);
+              writeStore(STORAGE.chapter, String(chapter));
+              renderChapter(String(chapter));
+            } else {
+              loadBook(book, String(chapter));
+            }
+          }
+          return;
         }
-      }
-    });
+        if (e.target.id === "plan-mark-complete" && state.planJump && window.BiblePlan) {
+          window.BiblePlan.toggle(state.planJump.id);
+          updatePlanJumpBar();
+        }
+      });
+    }
 
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") setMenuOpen(false);
@@ -462,7 +488,11 @@
       readerStatus: $("reader-status"),
       content: $("content"),
       menuToggle: $("menu-toggle"),
-      toolbarMenu: $("toolbar-menu")
+      toolbarMenu: $("toolbar-menu"),
+      planJumpBar: $("plan-jump-bar"),
+      planJumpLabel: $("plan-jump-label"),
+      planJumpChips: $("plan-jump-chips"),
+      planMarkComplete: $("plan-mark-complete")
     };
 
     restorePrefs();
@@ -498,7 +528,9 @@
       if (els.bookSelect && book) els.bookSelect.value = book;
       return loadBook(book, String(chapter));
     },
-    onPlanOpenChange: null
+    refreshPlanJumpBar: function () {
+      updatePlanJumpBar();
+    }
   };
 
   if (document.readyState === "loading") {

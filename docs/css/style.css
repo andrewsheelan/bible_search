@@ -866,30 +866,69 @@ button:disabled {
   font-size: 1rem;
 }
 
+.plan-jump-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem 0.6rem;
+  border-top: 1px solid var(--border);
+  background: var(--toolbar-bg);
+}
+
+.plan-jump-bar[hidden] {
+  display: none;
+}
+
+.plan-jump-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem 0.75rem;
+}
+
+.plan-jump-title {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.plan-complete-btn {
+  min-height: 36px;
+  padding: 0.3rem 0.75rem;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.plan-complete-btn.is-complete {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+.plan-chips {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.3rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.plan-chip {
+  min-height: 34px;
+  min-width: 2.25rem;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.85rem;
+  flex: 0 0 auto;
+}
+
 .plan-jump {
   margin: 0 0 1rem;
   padding: 0.75rem 0.9rem;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-}
-
-.plan-jump p {
-  margin: 0 0 0.5rem;
-  font-size: 0.95rem;
-}
-
-.plan-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
-.plan-chip {
-  min-height: 36px;
-  min-width: 2.4rem;
-  padding: 0.2rem 0.55rem;
-  font-size: 0.85rem;
 }
 
 @media (max-width: 720px) {

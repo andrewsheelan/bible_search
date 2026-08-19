@@ -113,7 +113,10 @@
   }
 
   function toggleReading(id) {
-    if (progress.status === "idle") return;
+    if (progress.status === "idle") {
+      progress.status = "active";
+      progress.startedAt = progress.startedAt || Date.now();
+    }
     if (isDone(id)) {
       delete progress.completed[id];
     } else {
@@ -127,6 +130,9 @@
     }
     saveProgress();
     render();
+    if (window.BibleApp && typeof window.BibleApp.refreshPlanJumpBar === "function") {
+      window.BibleApp.refreshPlanJumpBar();
+    }
   }
 
   function openReading(reading) {
@@ -346,4 +352,13 @@
   } else {
     init();
   }
+
+  window.BiblePlan = {
+    isDone: function (id) {
+      return progress ? isDone(id) : false;
+    },
+    toggle: function (id) {
+      if (progress) toggleReading(id);
+    }
+  };
 })();
