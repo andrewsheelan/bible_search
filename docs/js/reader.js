@@ -5,7 +5,7 @@
    * English-only chapter speech reader with verse highlight.
    * @param {{
    *   getVerseElements: () => NodeListOf<HTMLElement>|HTMLElement[],
-   *   getEnglishText: (el: HTMLElement) => string,
+   *   getVerseText: (el: HTMLElement) => string,
    *   btnPlay: HTMLButtonElement,
    *   btnPrev: HTMLButtonElement,
    *   btnNext: HTMLButtonElement,
@@ -16,13 +16,14 @@
    */
   function BibleReader(options) {
     this.getVerseElements = options.getVerseElements;
-    this.getEnglishText = options.getEnglishText;
+    this.getVerseText = options.getVerseText || options.getEnglishText;
     this.btnPlay = options.btnPlay;
     this.btnPrev = options.btnPrev;
     this.btnNext = options.btnNext;
     this.rateSelect = options.rateSelect;
     this.voiceSelect = options.voiceSelect || null;
     this.statusEl = options.statusEl;
+    this.defaultLang = options.defaultLang || "en-US";
 
     this.index = 0;
     this.playing = false;
@@ -98,6 +99,10 @@
     if (!this.voiceSelect) return;
     this.voiceSelect.value = uri;
     this._onVoiceChange();
+  };
+
+  BibleReader.prototype.setDefaultLang = function (lang) {
+    this.defaultLang = lang || "en-US";
   };
 
   BibleReader.prototype.resetToStart = function () {
@@ -208,7 +213,7 @@
     }
 
     this._applyHighlight();
-    var text = (this.getEnglishText(verses[this.index]) || "").trim();
+    var text = (this.getVerseText(verses[this.index]) || "").trim();
     if (!text) {
       this.index += 1;
       if (this.playing) this._speakCurrent();
@@ -221,7 +226,7 @@
 
     var utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = this.rate;
-    utterance.lang = (this.voice && this.voice.lang) || "en-US";
+    utterance.lang = (this.voice && this.voice.lang) || this.defaultLang || "en-US";
     if (this.voice) {
       utterance.voice = this.voice;
     }

@@ -7,6 +7,8 @@
     sinhala: "bible-reader-show-sinhala",
     rate: "bible-reader-rate",
     voice: "bible-reader-voice",
+    voiceTa: "bible-reader-voice-ta",
+    speechLang: "bible-reader-speech-lang",
     book: "bible-reader-book",
     chapter: "bible-reader-chapter"
   };
@@ -278,17 +280,36 @@
       });
   }
 
-  function scoreEnglishVoice(voice) {
+  function speechLang() {
+    return els.speechLangSelect && els.speechLangSelect.value === "ta" ? "ta" : "en";
+  }
+
+  function scoreVoice(voice, lang) {
     var name = (voice.name || "").toLowerCase();
-    var lang = (voice.lang || "").toLowerCase();
+    var vlang = (voice.lang || "").toLowerCase();
+    if (lang === "ta") {
+      var isTamil =
+        vlang.indexOf("ta") === 0 ||
+        name.indexOf("tamil") !== -1 ||
+        name.indexOf("தமிழ்") !== -1;
+      if (!isTamil) return -1;
+      var tscore = 10;
+      if (vlang.indexOf("ta-in") === 0 || vlang === "ta") tscore += 50;
+      if (name.indexOf("google") !== -1) tscore += 45;
+      if (name.indexOf("microsoft") !== -1) tscore += 40;
+      if (/neural|natural|enhanced|online/.test(name)) tscore += 30;
+      if (/espeak|compact|robot/.test(name)) tscore -= 25;
+      return tscore;
+    }
+
     var isEnglish =
-      lang.indexOf("en") === 0 || name.indexOf("english") !== -1;
+      vlang.indexOf("en") === 0 || name.indexOf("english") !== -1;
     if (!isEnglish) return -1;
 
     var score = 10;
-    if (lang === "en-us" || lang.indexOf("en-us") === 0) score += 50;
-    else if (lang.indexOf("en-gb") === 0) score += 35;
-    else if (lang.indexOf("en-au") === 0 || lang.indexOf("en-in") === 0) score += 28;
+    if (vlang === "en-us" || vlang.indexOf("en-us") === 0) score += 50;
+    else if (vlang.indexOf("en-gb") === 0) score += 35;
+    else if (vlang.indexOf("en-au") === 0 || vlang.indexOf("en-in") === 0) score += 28;
     else score += 18;
 
     if (name.indexOf("google") !== -1) score += 45;
@@ -310,10 +331,11 @@
       return;
     }
 
+    var lang = speechLang();
     var voices = window.speechSynthesis.getVoices() || [];
-    var english = voices
+    var ranked = voices
       .map(function (v) {
-        return { voice: v, score: scoreEnglishVoice(v) };
+        return { voice: v, score: scoreVoice(v, lang) };
       })
       .filter(function (item) {
         return item.score >= 0;
@@ -322,18 +344,45 @@
         return b.score - a.score || a.voice.name.localeCompare(b.voice.name);
       });
 
-    if (!english.length) {
-      els.voiceSelect.innerHTML = '<option value="">No English voices found</option>';
+    if (!ranked.length) {
+      els.voiceSelect.innerHTML =
+        lang === "ta"
+          ? '<option value="">No Tamil voice on this device</option>'
+          : '<option value="">No English voices found</option>';
       els.voiceSelect.disabled = true;
+      if (els.readerStatus) {
+        if (lang === "ta") {
+          els.readerStatus.hidden = false;
+          els.readerStatus.textContent =
+            "No Tamil system voice found. Chrome on Android usually has Google Tamil. On iPhone: Settings → Accessibility → Spoken Content → Voices → Tamil.";
+        } else {
+          els.readerStatus.hidden = true;
+        }
+      }
+      if (reader && !reader.unsupported) {
+        els.btnPlay.disabled = lang === "ta";
+        els.btnPrev.disabled = lang === "ta";
+        els.btnNext.disabled = lang === "ta";
+      }
       return;
     }
 
+    if (els.readerStatus && els.readerStatus.textContent.indexOf("Tamil") !== -1) {
+      els.readerStatus.hidden = true;
+    }
+    if (reader && !reader.unsupported) {
+      els.btnPlay.disabled = false;
+      els.btnPrev.disabled = false;
+      els.btnNext.disabled = false;
+    }
+
     els.voiceSelect.disabled = false;
-    var saved = readStore(STORAGE.voice, "");
+    var storeKey = lang === "ta" ? STORAGE.voiceTa : STORAGE.voice;
+    var saved = readStore(storeKey, "");
     var html = "";
     var hasSaved = false;
 
-    english.forEach(function (item, index) {
+    ranked.forEach(function (item, index) {
       var v = item.voice;
       var uri = v.voiceURI || v.name;
       if (uri === saved) hasSaved = true;
@@ -348,11 +397,16 @@
     });
 
     els.voiceSelect.innerHTML = html;
-    els.voiceSelect.value = hasSaved ? saved : english[0].voice.voiceURI || english[0].voice.name;
-    writeStore(STORAGE.voice, els.voiceSelect.value);
+    els.voiceSelect.value = hasSaved ? saved : ranked[0].voice.voiceURI || ranked[0].voice.name;
+    writeStore(storeKey, els.voiceSelect.value);
 
-    if (reader && typeof reader.setVoiceByURI === "function") {
-      reader.setVoiceByURI(els.voiceSelect.value);
+    if (reader) {
+      if (typeof reader.setDefaultLang === "function") {
+        reader.setDefaultLang(lang === "ta" ? "ta-IN" : "en-US");
+      }
+      if (typeof reader.setVoiceByURI === "function") {
+        reader.setVoiceByURI(els.voiceSelect.value);
+      }
     }
   }
 
@@ -375,8 +429,9 @@
       getVerseElements: function () {
         return els.content.querySelectorAll(".verse-row");
       },
-      getEnglishText: function (el) {
-        var node = el.querySelector(".lang-en .verse-text");
+      getVerseText: function (el) {
+        var sel = speechLang() === "ta" ? ".lang-ta .verse-text" : ".lang-en .verse-text";
+        var node = el.querySelector(sel);
         return node ? node.textContent : "";
       },
       btnPlay: els.btnPlay,
@@ -384,7 +439,8 @@
       btnNext: els.btnNext,
       rateSelect: els.rateSelect,
       voiceSelect: els.voiceSelect,
-      statusEl: els.readerStatus
+      statusEl: els.readerStatus,
+      defaultLang: speechLang() === "ta" ? "ta-IN" : "en-US"
     });
   }
 
@@ -422,8 +478,21 @@
     });
 
     els.voiceSelect.addEventListener("change", function () {
-      writeStore(STORAGE.voice, els.voiceSelect.value);
+      var key = speechLang() === "ta" ? STORAGE.voiceTa : STORAGE.voice;
+      writeStore(key, els.voiceSelect.value);
     });
+
+    if (els.speechLangSelect) {
+      els.speechLangSelect.addEventListener("change", function () {
+        writeStore(STORAGE.speechLang, els.speechLangSelect.value);
+        if (els.speechLangSelect.value === "ta") {
+          els.toggleTamil.checked = true;
+          applyLangVisibility();
+        }
+        if (reader) reader.pause();
+        populateVoiceSelect();
+      });
+    }
 
     els.menuToggle.addEventListener("click", function () {
       setMenuOpen(els.toolbarMenu.hidden);
@@ -471,6 +540,11 @@
     if (["0.75", "1", "1.25", "1.5"].indexOf(rate) !== -1) {
       els.rateSelect.value = rate;
     }
+
+    if (els.speechLangSelect) {
+      var lang = readStore(STORAGE.speechLang, "en");
+      els.speechLangSelect.value = lang === "ta" ? "ta" : "en";
+    }
   }
 
   function init() {
@@ -485,6 +559,7 @@
       btnNext: $("btn-next"),
       rateSelect: $("rate-select"),
       voiceSelect: $("voice-select"),
+      speechLangSelect: $("speech-lang-select"),
       readerStatus: $("reader-status"),
       content: $("content"),
       menuToggle: $("menu-toggle"),

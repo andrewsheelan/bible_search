@@ -8,7 +8,7 @@ Multilingual Bible reader (English NKJV, Tamil, Sinhala) with speech playback. T
 
 - Book and chapter dropdowns (Old / New Testament groups)
 - English always visible; Tamil and Sinhala optional (on by default)
-- English text-to-speech with verse highlight, prev/next, speed, and voice picker
+- English and Tamil text-to-speech (uses system voices; Tamil is best on Chrome/Android or after installing a Tamil voice) with verse highlight, prev/next, speed, and voice picker
 - Themes: Light, Dark, High contrast light, High contrast dark
 - **Desktop:** book/chapter in the top bar; Prev / Play / Next / Menu on the right; parallel language columns
 - **Mobile:** book/chapter only in the top bar; floating bottom dock for playback and Menu; languages stacked per verse
